@@ -1,0 +1,32 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exemplo de Senha</title>
+</head>
+<body>
+    <button onclick="getPassword()">Obter Senha</button>
+    <p id="senha"></p>
+
+    <input type="text" id="senhaUsuario" placeholder="Digite sua senha">
+    <button onclick="confirmarSenha()">Confirmar</button>
+
+    <script>
+        function getPassword() {
+            let senhaAleatoria = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('senha').innerText = "Sua senha é: " + senhaAleatoria;
+            localStorage.setItem('senhaCorreta', senhaAleatoria);
+        }
+
+        function confirmarSenha() {
+            let senhaDigitada = document.getElementById('senhaUsuario').value;
+            let senhaCorreta = localStorage.getItem('senhaCorreta');
+            if (senhaDigitada === senhaCorreta) {
+                window.location.href = "nova_pagina.html";
+            } else {
+                alert("Senha incorreta. Tente novamente!");
+            }
+        }
+    </script>
+</body>
+</html>

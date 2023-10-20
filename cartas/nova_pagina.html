@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nova Página</title>
+</head>
+<body>
+    <h2 id="mensagem"></h2>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let senhaCorreta = localStorage.getItem('senhaCorreta');
+            let cartas = ["As de Copas","2 de Copas","8 de Espadas","As de Ouro","K de Paus","6 de Espadas","J de Copas","3 de Ouro","As de Paus","J de Ouro"];
+            let index = parseInt(senhaCorreta) - 1;
+            let carta = cartas[index];
+            document.getElementById('mensagem').innerText = "Sua carta é " + carta;
+        });
+    </script>
+</body>
+</html>
