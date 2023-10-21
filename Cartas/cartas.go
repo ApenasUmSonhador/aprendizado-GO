@@ -4,12 +4,23 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"sync"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+var mu sync.Mutex
+
 // variavel que iremos utilizar como a senha correta gerada
 var senha_correta string
+
+// Função capaz de gerar senha e colocá-la na fila
+func gerar_senha() {
+	mu.Lock()
+	senha_aleatoria := rand.Intn(10) + 1
+	senha_correta = strconv.Itoa(senha_aleatoria)
+	mu.Unlock()
+}
 
 func main() {
 	app := fiber.New()
@@ -38,8 +49,7 @@ func main() {
 	})
 	//rota para a ação de gerar nova senha
 	app.Post("/gerar_senha", func(c *fiber.Ctx) error {
-		senha_aleatoria := rand.Intn(10) + 1
-		senha_correta = strconv.Itoa(senha_aleatoria)
+		gerar_senha()
 		// redireciona a raiz após a geração
 		return c.Redirect("/")
 	})
