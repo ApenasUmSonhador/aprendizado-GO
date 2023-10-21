@@ -1,5 +1,6 @@
 package main
 
+
 import (
 	"fmt"
 	"math/rand"
@@ -49,7 +50,9 @@ func main() {
 	})
 	//rota para a ação de gerar nova senha
 	app.Post("/gerar_senha", func(c *fiber.Ctx) error {
-		GerarSenha()
+		go GerarSenha()
+		mu.Lock()
+		defer mu.Unlock()
 		// redireciona a raiz após a geração
 		return c.Redirect("/")
 	})
