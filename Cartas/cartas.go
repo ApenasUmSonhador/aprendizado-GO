@@ -15,7 +15,7 @@ var mu sync.Mutex
 var senha_correta string
 
 // Função capaz de gerar senha e colocá-la na fila
-func gerar_senha() {
+func GerarSenha() {
 	mu.Lock()
 	senha_aleatoria := rand.Intn(10) + 1
 	senha_correta = strconv.Itoa(senha_aleatoria)
@@ -49,7 +49,7 @@ func main() {
 	})
 	//rota para a ação de gerar nova senha
 	app.Post("/gerar_senha", func(c *fiber.Ctx) error {
-		gerar_senha()
+		GerarSenha()
 		// redireciona a raiz após a geração
 		return c.Redirect("/")
 	})
