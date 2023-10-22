@@ -6,10 +6,35 @@ import (
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+type Fila struct {
+	elementos []string
+}
+
+func nova_fila() *Fila {
+	return &Fila{
+		elementos: make([]string, 0),
+	}
+}
+func (f *Fila) enfileirar(item string) {
+	f.elementos = append(f.elementos, item)
+}
+func (f *Fila) desenfileirar() (string, bool) {
+	if f.fila_vazia() {
+		return "", false
+	}
+	item := f.elementos[0]
+	f.elementos = f.elementos[1:]
+	return item, true
+}
+func (f *Fila) fila_vazia() bool {
+	return len(f.elementos) == 0
+}
 
 var mu sync.Mutex
 
@@ -25,6 +50,7 @@ func GerarSenha() {
 }
 
 func main() {
+	var cartas_retiradas = nova_fila()
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -44,8 +70,14 @@ func main() {
 			return c.SendString("Erro ao ler o arquivo HTML")
 		}
 
-		//senhaCorreta é adicionada ao %s e html enviado como resposta
-		return c.SendString(fmt.Sprintf(string(htmlContent), senha_correta))
+		cartasNaFila := []string{}
+		for !cartas_retiradas.fila_vazia() {
+			item, _ := cartas_retiradas.desenfileirar()
+			cartasNaFila = append(cartasNaFila, "<li>"+item+"</li>")
+		}
+
+		//senhaCorreta é adicionada ao %s e html enviadr como resosta
+		return c.SendString(fmt.Sprintf(string(htmlContent), senha_correta, strings.Join(cartasNaFila, "\n")))
 	})
 
 	//rota para a ação de gerar nova senha
@@ -58,7 +90,7 @@ func main() {
 	})
 	//rota para confirmar senha
 	app.Post("/confirmar_senha", func(c *fiber.Ctx) error {
-		// obtem senha digitada pelo usuário e faz a comparação com a correta
+		//obtem senha digitada pelo usuário e faz a comparação com a correta
 		senha_digitada := c.FormValue("senha_usuario")
 		//retorna ou para a pagina onde mostra a carta ou para uma mensagem de erro dependendo da comparação
 		c.Type("html", "utf-8")
@@ -85,13 +117,14 @@ func main() {
 		// carta recebe a carta sorteada
 		carta := cartas[index]
 		if senha_digitada == senha_correta {
+			cartas_retiradas.enfileirar(carta)
 			return c.SendString(fmt.Sprintf(string(htmlContent), carta))
 		} else {
 			return c.SendString("Senha incorreta. Tente novamente!")
 		}
 	})
 	//definição rota segunda_pagina
-	app.Get("/nova_pagina", func(c *fiber.Ctx) error {
+	app.Get("/page-2", func(c *fiber.Ctx) error {
 		c.Type("html", "utf-8")
 		// Abrindo o arquivo HTML da pasta
 		file, err := os.Open("static/page-2.html")
@@ -107,6 +140,7 @@ func main() {
 			// Lidar com erros de leitura
 			return c.SendString("Erro ao ler o arquivo HTML")
 		}
+
 		return c.SendString(fmt.Sprintf(string(htmlContent)))
 	})
 
