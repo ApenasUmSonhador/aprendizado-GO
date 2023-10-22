@@ -3,7 +3,7 @@
 ### [Link do último commit](https://github.com/ApenasUmSonhador/aprendizado-GO/commit/efa1c8f2d887edc29621cb1c4db4a12e04d4fe1d)
 Caio foi o primeiro a mexer no código, Arthur e Lucas estavamos muito ocupados sexta-feira. 
 Portanto, por estar mais habituado a trabalhar com JavaScript, optou por fazer o esqueleto da estrutura do código que viria a ser utilizado pelos demais.
-Tentou colocar em codigo oq entendeu do desafio proposto, mas claro que ainda faltavam ideias que seriam abordadas por Lucas e Arthur.
+Tentou colocar em código o que entendeu do desafio proposto, mas claro que ainda faltavam ideias que seriam abordadas por Lucas e Arthur.
 ## Lucas:
 ### [Link do último commit](https://github.com/ApenasUmSonhador/aprendizado-GO/commit/8e6ddb9c1e50d74fed038cf028b495ce97809073)
 Foi quem realmente começou a por as mãos no código Go e, seguindo conselhos e em conversação constante com Arthur e Caio, desenvolveu esse código sem lock e unlock, coisa que havia sido implementada por Arthur quando sua branch estava intacta.
