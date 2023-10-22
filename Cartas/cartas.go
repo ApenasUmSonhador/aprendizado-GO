@@ -22,18 +22,38 @@ func nova_fila() *Fila {
 	}
 }
 func (f *Fila) enfileirar(item string) {
+	mu.Lock()
 	f.elementos = append(f.elementos, item)
+	mu.Unlock()
 }
 func (f *Fila) desenfileirar() (string, bool) {
+	mu.Lock()
 	if f.fila_vazia() {
+		mu.Unlock()
 		return "", false
 	}
 	item := f.elementos[0]
 	f.elementos = f.elementos[1:]
+	mu.Unlock()
 	return item, true
 }
 func (f *Fila) fila_vazia() bool {
 	return len(f.elementos) == 0
+}
+
+func carregarHTML(arquivo string) (string, error) {
+	file, err := os.Open(arquivo)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	htmlContent, err := io.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	return string(htmlContent), nil
 }
 
 var mu sync.Mutex
@@ -55,21 +75,10 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		c.Type("html", "utf-8") // a codificação UTF-8 é para consertar problemas de texto
-		// Abrindo o arquivo HTML da pasta
-		file, err := os.Open("static/inicio.html")
+		htmlContent, err := carregarHTML("static/inicio.html")
 		if err != nil {
-			// Lidar com erros, como arquivo não encontrado
 			return c.SendString("Erro ao carregar o arquivo HTML")
 		}
-		defer file.Close()
-
-		// Lendo o conteúdo do arquivo
-		htmlContent, err := io.ReadAll(file)
-		if err != nil {
-			// Lidar com erros de leitura
-			return c.SendString("Erro ao ler o arquivo HTML")
-		}
-
 		cartasNaFila := []string{}
 		for !cartas_retiradas.fila_vazia() {
 			item, _ := cartas_retiradas.desenfileirar()
@@ -95,15 +104,7 @@ func main() {
 		//retorna ou para a pagina onde mostra a carta ou para uma mensagem de erro dependendo da comparação
 		c.Type("html", "utf-8")
 		// Abrindo o arquivo HTML da pasta
-		file, err := os.Open("static/confirma-senha.html")
-		if err != nil {
-			// Lidar com erros, como arquivo não encontrado
-			return c.SendString("Erro ao carregar o arquivo HTML")
-		}
-		defer file.Close()
-
-		// Lendo o conteúdo do arquivo
-		htmlContent, err := io.ReadAll(file)
+		htmlContent, err := carregarHTML("static/confirma-senha.html")
 		if err != nil {
 			// Lidar com erros de leitura
 			return c.SendString("Erro ao ler o arquivo HTML")
@@ -127,15 +128,7 @@ func main() {
 	app.Get("/page-2", func(c *fiber.Ctx) error {
 		c.Type("html", "utf-8")
 		// Abrindo o arquivo HTML da pasta
-		file, err := os.Open("static/page-2.html")
-		if err != nil {
-			// Lidar com erros, como arquivo não encontrado
-			return c.SendString("Erro ao carregar o arquivo HTML")
-		}
-		defer file.Close()
-
-		// Lendo o conteúdo do arquivo
-		htmlContent, err := io.ReadAll(file)
+		htmlContent, err := carregarHTML("static/page-2.html")
 		if err != nil {
 			// Lidar com erros de leitura
 			return c.SendString("Erro ao ler o arquivo HTML")
