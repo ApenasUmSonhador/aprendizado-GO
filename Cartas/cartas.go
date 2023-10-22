@@ -134,7 +134,11 @@ func main() {
 		}
 
 		// Senha correta é adicionada ao %s e o HTML é enviado como resposta
-		return c.SendString(fmt.Sprintf(string(htmlContent), senha_correta, strings.Join(cartasNaFila, "\n")))
+		SenhaToHTML := strconv.Itoa(senha_correta)
+		if SenhaToHTML == "0"{
+			SenhaToHTML = ""
+		}
+		return c.SendString(fmt.Sprintf(string(htmlContent), string(SenhaToHTML), strings.Join(cartasNaFila, "\n")))
 	})
 
 	// Rota para a ação de gerar uma nova senha
