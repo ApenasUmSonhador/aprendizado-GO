@@ -76,9 +76,9 @@ func main() {
 		elementos: make([]string, 0),
 	}
 	cartasNaFila := []string{}
+	// Maneira elegante de escrever as cartas
 	valores := []string{"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"}
 	naipes := []string{" de Copas", " de Espadas", " de Ouros", " de Paus"}
-
 	cartas := []string{}
 	for _, valor := range valores {
 		for _, naipe := range naipes {
