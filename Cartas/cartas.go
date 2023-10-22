@@ -58,11 +58,6 @@ func carregarHTML(arquivo string) (string, error) {
 	return string(htmlContent), nil
 }
 
-var mu sync.Mutex
-
-// Variável que será usada para armazenar a senha correta gerada
-var senha_correta string
-
 // Função para gerar uma senha e adicioná-la à fila
 func GerarSenha() {
 	mu.Lock()
@@ -71,11 +66,26 @@ func GerarSenha() {
 	mu.Unlock()
 }
 
+var mu sync.Mutex
+
+// Variável que será usada para armazenar a senha correta gerada
+var senha_correta string
+
 func main() {
 	var cartas_retiradas = &Fila{
 		elementos: make([]string, 0),
 	}
 	cartasNaFila := []string{}
+	valores := []string{"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"}
+	naipes := []string{" de Copas", " de Espadas", " de Ouros", " de Paus"}
+
+	cartas := []string{}
+	for _, valor := range valores {
+		for _, naipe := range naipes {
+			carta := valor + naipe
+			cartas = append(cartas, carta)
+		}
+	}
 
 	app := fiber.New()
 
@@ -115,7 +125,6 @@ func main() {
 		// Conversão para inteiro, ignorando o segundo valor de retorno (possível erro de conversão)
 		index, _ := strconv.Atoi(senha_correta)
 		index--
-		cartas := []string{"As de Copas", "2 de Copas", "8 de Espadas", "As de Ouro", "K de Paus", "6 de Espadas", "J de Copas", "3 de Ouro", "As de Paus", "J de Ouro"}
 		carta := cartas[index]
 		if senha_digitada == senha_correta {
 			cartas_retiradas.enfileirar(carta)
