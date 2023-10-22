@@ -59,17 +59,39 @@ func carregarHTML(arquivo string) (string, error) {
 }
 
 // Função para gerar uma senha e adicioná-la à fila
-func GerarSenha() {
+func GerarSenha(senhas *[]int, senhasUsadas map[int]bool, cartasAssociadas map[int]string) int {
 	mu.Lock()
-	senha_aleatoria := rand.Intn(10) + 1
-	senha_correta = strconv.Itoa(senha_aleatoria)
-	mu.Unlock()
+	defer mu.Unlock()
+	if len(*senhas) == 0 {
+		return -1 // Retorna um valor especial para indicar que não há senhas disponíveis
+	}
+	senha_aleatoria := rand.Intn(len(*senhas))
+	senha_correta := (*senhas)[senha_aleatoria]
+
+	// Verifica se a senha gerada já foi usada
+	if _, ok := senhasUsadas[senha_correta]; ok {
+		// Se a senha já foi usada, gere outra
+		return GerarSenha(senhas, senhasUsadas, cartasAssociadas)
+	}
+
+	// Marca a senha como usada
+	senhasUsadas[senha_correta] = true
+
+	// Verifica se a senha já está associada a uma carta
+	if _, ok := cartasAssociadas[senha_correta]; ok {
+		// Se a senha já está associada a uma carta, gere outra
+		return GerarSenha(senhas, senhasUsadas, cartasAssociadas)
+	}
+
+	(*senhas) = append((*senhas)[:senha_aleatoria], (*senhas)[senha_aleatoria+1:]...)
+
+	return senha_correta
 }
 
 var mu sync.Mutex
 
 // Variável que será usada para armazenar a senha correta gerada
-var senha_correta string
+var senha_correta int
 
 func main() {
 	var cartas_retiradas = &Fila{
@@ -86,6 +108,16 @@ func main() {
 			cartas = append(cartas, carta)
 		}
 	}
+	// Declarando os tokens (maneira simplificada)
+	senhas := []int{}
+	for i := 1; i < 53; i++ {
+		senhas = append(senhas, i)
+	}
+
+	// Map para rastrear as senhas usadas
+	senhasUsadas := make(map[int]bool)
+	// Map para rastrear as cartas associadas a senhas
+	cartasAssociadas := make(map[int]string)
 
 	app := fiber.New()
 
@@ -100,34 +132,50 @@ func main() {
 			item, _ := cartas_retiradas.desenfileirar()
 			cartasNaFila = append(cartasNaFila, "<li>"+item+"</li>")
 		}
+
 		// Senha correta é adicionada ao %s e o HTML é enviado como resposta
 		return c.SendString(fmt.Sprintf(string(htmlContent), senha_correta, strings.Join(cartasNaFila, "\n")))
 	})
 
 	// Rota para a ação de gerar uma nova senha
 	app.Post("/gerar_senha", func(c *fiber.Ctx) error {
-		go GerarSenha()
+		senha := GerarSenha(&senhas, senhasUsadas, cartasAssociadas)
+		if senha == -1 {
+			return c.SendString("Todas as senhas já foram usadas")
+		}
 		mu.Lock()
-		defer mu.Unlock()
+		senha_correta = senha
+		mu.Unlock()
 		// Redireciona para a raiz após a geração
 		return c.Redirect("/")
 	})
 
 	// Rota para confirmar a senha
 	app.Post("/confirmar_senha", func(c *fiber.Ctx) error {
-		// Obtém a senha digitada pelo usuário e compara com a senha correta
+		// Obtém a senha digitada pelo usuário
 		senha_digitada := c.FormValue("senha_usuario")
 		c.Type("html", "utf-8")
 		htmlContent, err := carregarHTML("static/confirma-senha.html")
 		if err != nil {
 			return c.SendString("Erro ao ler o arquivo HTML")
 		}
-		// Conversão para inteiro, ignorando o segundo valor de retorno (possível erro de conversão)
-		index, _ := strconv.Atoi(senha_correta)
-		index--
-		carta := cartas[index]
-		if senha_digitada == senha_correta {
+
+		// Converte a senha correta para string
+		senha_correta_str := strconv.Itoa(senha_correta)
+
+		if senha_digitada == senha_correta_str {
+			carta := cartas[senha_correta-1]
+
+			// Verifica se a carta já foi retirada
+			if _, ok := cartasAssociadas[senha_correta]; ok {
+				return c.SendString("Carta já retirada. Tente novamente!")
+			}
+
+			// Marca a carta como retirada
 			cartas_retiradas.enfileirar(carta)
+			// Associa a senha à carta
+			cartasAssociadas[senha_correta] = carta
+
 			return c.SendString(fmt.Sprintf(string(htmlContent), carta))
 		} else {
 			return c.SendString("Senha incorreta. Tente novamente!")
