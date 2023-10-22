@@ -1,7 +1,7 @@
 # Progresso Desafio GO CEOS - Cartas
 ## Caio:
 ### [Link do último commit](https://github.com/ApenasUmSonhador/aprendizado-GO/commit/efa1c8f2d887edc29621cb1c4db4a12e04d4fe1d)
-Caio foi o primeiro a mexer no código, Arthur e Lucas estavamos muito ocupados sexta-feira. 
+Caio foi o primeiro a mexer no código, Arthur e Lucas estavam muito ocupados sexta-feira. 
 Portanto, por estar mais habituado a trabalhar com JavaScript, optou por fazer o esqueleto da estrutura do código que viria a ser utilizado pelos demais.
 Tentou colocar em código o que entendeu do desafio proposto, mas claro que ainda faltavam ideias que seriam abordadas por Lucas e Arthur.
 ## Lucas:
