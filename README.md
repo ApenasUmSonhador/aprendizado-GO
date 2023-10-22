@@ -16,5 +16,5 @@ Arthur implementou locks e unlocks, passou um pente fino no código e descobriu 
 Por ter mais familiaridade com Git e GitHub, já deu merge na Main e foi o último a mexer no código.
 ## Resumo:
 **Caio:** Iniciou os trabalhos fazendo esqueleto em JavaScript. <br>
-**Lucas:** Partiu do esqueleto de Caio e começou a desenvolver a lógica. <br>
+**Lucas:** Partiu do esqueleto de Caio e começou a desenvolver a lógica em Go, implementou as estrutura de fila e o esquema de adição das cartas retiradas. <br>
 **Arthur:** Revisou código, fazendo algumas melhorias pontuais sem editar a lógica (devido ao horário em que trabalhou) e implementou Locks e Unlocks.
