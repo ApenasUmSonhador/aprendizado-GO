@@ -12,9 +12,9 @@ Porém, por problemas de git, sua branch teve que ser apagada e seu último cód
 ### [Link da sua sequência de commits](https://github.com/ApenasUmSonhador/aprendizado-GO/commits/main)
 Arthur não tem um computador próprio e infelizmente, após apresentar um trabalho de FBD teve que se ausentar da UFC, dificultando seu acesso a computadores, porém, no sábado foi para a casa de sua namorada e utilizou o computador dela para trabalhar no projeto.
 Arthur aproveitou o último código de Lucas e começou a fazer um papel de revisor e a ter ideia que documentou em um grupo privado com os membros Caio e Lucas.
-Arthur implementou locks e unlocks, passou um pente fino no código e descobriu maneiras de carregar um HTML sem ter que escrevê-lo explicitamente em "contentHTML".
+Arthur implementou locks e unlocks, passou um pente fino no código, corrigindo problemas, por exemplo, de 2 tokens apontarem para uma mesma carta e descobriu maneiras de carregar um HTML sem ter que escrevê-lo explicitamente em "contentHTML".
 Por ter mais familiaridade com Git e GitHub, já deu merge na Main e foi o último a mexer no código.
 ## Resumo:
 **Caio:** Iniciou os trabalhos fazendo esqueleto em JavaScript. <br>
 **Lucas:** Partiu do esqueleto de Caio e começou a desenvolver a lógica em Go, implementou as estrutura de fila e o esquema de adição das cartas retiradas. <br>
-**Arthur:** Revisou código, fazendo algumas melhorias pontuais sem editar a lógica (devido ao horário em que trabalhou) e implementou Locks e Unlocks.
+**Arthur:** Revisou código, fazendo algumas melhorias pontuais, não permitiu que um token aponte para mais que uma carta ,implementou Locks e Unlocks.
