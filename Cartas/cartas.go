@@ -12,20 +12,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Definição de uma estrutura de fila
 type Fila struct {
 	elementos []string
 }
 
+// Função para criar uma nova fila
 func nova_fila() *Fila {
 	return &Fila{
 		elementos: make([]string, 0),
 	}
 }
+
+// Função para enfileirar um item na fila
 func (f *Fila) enfileirar(item string) {
 	mu.Lock()
 	f.elementos = append(f.elementos, item)
 	mu.Unlock()
 }
+
+// Função para desenfileirar um item da fila
 func (f *Fila) desenfileirar() (string, bool) {
 	mu.Lock()
 	if f.fila_vazia() {
@@ -37,10 +43,13 @@ func (f *Fila) desenfileirar() (string, bool) {
 	mu.Unlock()
 	return item, true
 }
+
+// Função para verificar se a fila está vazia
 func (f *Fila) fila_vazia() bool {
 	return len(f.elementos) == 0
 }
 
+// Função para carregar conteúdo HTML de um arquivo
 func carregarHTML(arquivo string) (string, error) {
 	file, err := os.Open(arquivo)
 	if err != nil {
@@ -58,10 +67,10 @@ func carregarHTML(arquivo string) (string, error) {
 
 var mu sync.Mutex
 
-// variavel que iremos utilizar como a senha correta gerada
+// Variável que será usada para armazenar a senha correta gerada
 var senha_correta string
 
-// Função capaz de gerar senha e colocá-la na fila
+// Função para gerar uma senha e adicioná-la à fila
 func GerarSenha() {
 	mu.Lock()
 	senha_aleatoria := rand.Intn(10) + 1
@@ -73,8 +82,9 @@ func main() {
 	var cartas_retiradas = nova_fila()
 	app := fiber.New()
 
+	// Rota principal para exibir a página inicial
 	app.Get("/", func(c *fiber.Ctx) error {
-		c.Type("html", "utf-8") // a codificação UTF-8 é para consertar problemas de texto
+		c.Type("html", "utf-8")
 		htmlContent, err := carregarHTML("static/inicio.html")
 		if err != nil {
 			return c.SendString("Erro ao carregar o arquivo HTML")
@@ -84,38 +94,32 @@ func main() {
 			item, _ := cartas_retiradas.desenfileirar()
 			cartasNaFila = append(cartasNaFila, "<li>"+item+"</li>")
 		}
-
-		//senhaCorreta é adicionada ao %s e html enviadr como resosta
+		// Senha correta é adicionada ao %s e o HTML é enviado como resposta
 		return c.SendString(fmt.Sprintf(string(htmlContent), senha_correta, strings.Join(cartasNaFila, "\n")))
 	})
 
-	//rota para a ação de gerar nova senha
+	// Rota para a ação de gerar uma nova senha
 	app.Post("/gerar_senha", func(c *fiber.Ctx) error {
 		go GerarSenha()
 		mu.Lock()
 		defer mu.Unlock()
-		// redireciona a raiz após a geração
+		// Redireciona para a raiz após a geração
 		return c.Redirect("/")
 	})
-	//rota para confirmar senha
+
+	// Rota para confirmar a senha
 	app.Post("/confirmar_senha", func(c *fiber.Ctx) error {
-		//obtem senha digitada pelo usuário e faz a comparação com a correta
+		// Obtém a senha digitada pelo usuário e compara com a senha correta
 		senha_digitada := c.FormValue("senha_usuario")
-		//retorna ou para a pagina onde mostra a carta ou para uma mensagem de erro dependendo da comparação
 		c.Type("html", "utf-8")
-		// Abrindo o arquivo HTML da pasta
 		htmlContent, err := carregarHTML("static/confirma-senha.html")
 		if err != nil {
-			// Lidar com erros de leitura
 			return c.SendString("Erro ao ler o arquivo HTML")
 		}
-		// conversão para inteiro, utlizamos '_' para ignorar o segundo valor de retorno ( variável do tipo error que indica se a conversão foi bem-sucedida, podemos implementar futuramenete)
+		// Conversão para inteiro, ignorando o segundo valor de retorno (possível erro de conversão)
 		index, _ := strconv.Atoi(senha_correta)
-		// indices começam em 0, por isso a subtração
 		index--
-		//lista de cartas possiveis
 		cartas := []string{"As de Copas", "2 de Copas", "8 de Espadas", "As de Ouro", "K de Paus", "6 de Espadas", "J de Copas", "3 de Ouro", "As de Paus", "J de Ouro"}
-		// carta recebe a carta sorteada
 		carta := cartas[index]
 		if senha_digitada == senha_correta {
 			cartas_retiradas.enfileirar(carta)
@@ -124,16 +128,14 @@ func main() {
 			return c.SendString("Senha incorreta. Tente novamente!")
 		}
 	})
-	//definição rota segunda_pagina
+
+	// Rota para a segunda página
 	app.Get("/page-2", func(c *fiber.Ctx) error {
 		c.Type("html", "utf-8")
-		// Abrindo o arquivo HTML da pasta
 		htmlContent, err := carregarHTML("static/page-2.html")
 		if err != nil {
-			// Lidar com erros de leitura
 			return c.SendString("Erro ao ler o arquivo HTML")
 		}
-
 		return c.SendString(fmt.Sprintf(string(htmlContent)))
 	})
 
