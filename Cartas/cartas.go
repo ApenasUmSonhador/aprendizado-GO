@@ -17,13 +17,6 @@ type Fila struct {
 	elementos []string
 }
 
-// Função para criar uma nova fila
-func nova_fila() *Fila {
-	return &Fila{
-		elementos: make([]string, 0),
-	}
-}
-
 // Função para enfileirar um item na fila
 func (f *Fila) enfileirar(item string) {
 	mu.Lock()
@@ -79,7 +72,11 @@ func GerarSenha() {
 }
 
 func main() {
-	var cartas_retiradas = nova_fila()
+	var cartas_retiradas = &Fila{
+		elementos: make([]string, 0),
+	}
+	cartasNaFila := []string{}
+
 	app := fiber.New()
 
 	// Rota principal para exibir a página inicial
@@ -89,7 +86,6 @@ func main() {
 		if err != nil {
 			return c.SendString("Erro ao carregar o arquivo HTML")
 		}
-		cartasNaFila := []string{}
 		for !cartas_retiradas.fila_vazia() {
 			item, _ := cartas_retiradas.desenfileirar()
 			cartasNaFila = append(cartasNaFila, "<li>"+item+"</li>")
