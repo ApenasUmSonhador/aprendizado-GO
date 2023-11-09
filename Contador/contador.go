@@ -18,10 +18,8 @@ func incrementa() {
 
 func main() {
 	app := fiber.New()
-
-	go incrementa()
-
 	app.Get("/", func(c *fiber.Ctx) error {
+		go incrementa()
 		mu.Lock()
 		defer mu.Unlock()
 		response := fmt.Sprintf("O valor atual do contador é: %d", contador)
